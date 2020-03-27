@@ -14,7 +14,6 @@ public class JsonConverterConfig extends ConverterConfig {
   private static final String SCHEMAS_ENABLE_DOC = "Include schemas within each of the serialized values and keys.";
   private static final String SCHEMAS_ENABLE_DISPLAY = "Enable Schemas";
 
-
   private final static ConfigDef CONFIG;
 
   static {
