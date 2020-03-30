@@ -1,5 +1,7 @@
 package com.purbon.kafka.connect.jdbc.dialect;
 
+import io.confluent.connect.jdbc.dialect.DatabaseDialect;
+import io.confluent.connect.jdbc.dialect.DatabaseDialectProvider.SubprotocolBasedProvider;
 import io.confluent.connect.jdbc.dialect.OracleDatabaseDialect;
 import io.confluent.connect.jdbc.sink.metadata.SinkRecordField;
 import org.apache.kafka.common.config.AbstractConfig;
@@ -12,6 +14,20 @@ public class CustomOracleDatabaseDialog extends OracleDatabaseDialect {
 
   public CustomOracleDatabaseDialog(AbstractConfig config) {
     super(config);
+  }
+
+  /**
+   * The provider for {@link OracleDatabaseDialect}.
+   */
+  public static class Provider extends SubprotocolBasedProvider {
+    public Provider() {
+      super(CustomOracleDatabaseDialog.class.getSimpleName(), "customOracle");
+    }
+
+    @Override
+    public DatabaseDialect create(AbstractConfig config) {
+      return new CustomOracleDatabaseDialog(config);
+    }
   }
 
   @Override
