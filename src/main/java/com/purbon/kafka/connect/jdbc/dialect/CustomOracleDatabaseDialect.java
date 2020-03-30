@@ -21,7 +21,7 @@ public class CustomOracleDatabaseDialect extends OracleDatabaseDialect {
    */
   public static class Provider extends SubprotocolBasedProvider {
     public Provider() {
-      super(CustomOracleDatabaseDialect.class.getSimpleName(), "customOracle");
+      super(CustomOracleDatabaseDialect.class.getSimpleName(), "oracle");
     }
 
     @Override
