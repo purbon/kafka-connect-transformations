@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -314,11 +316,28 @@ public class JSONConverter implements Converter, HeaderConverter {
     } else if (value instanceof Double) {
       schema = Schema.FLOAT64_SCHEMA;
     } else if (value instanceof String) {
-      schema = SchemaBuilder
-          .string()
-          .defaultValue("")
-          .optional()
-          .build();
+      String valueAsString = String.valueOf(value);
+      if (isStringAnInteger(valueAsString)) {
+        schema = Schema.INT64_SCHEMA;
+      } else if (isStringAFloat(valueAsString)) {
+        schema = Schema.FLOAT64_SCHEMA;
+      } else if (isStringADate(key, valueAsString)) {
+        schema = SchemaBuilder
+            .string()
+            .name(Date.LOGICAL_NAME)
+            .build();
+      } else if (isStringATimestamp(key, valueAsString)) {
+        schema = SchemaBuilder
+            .string()
+            .name(Timestamp.LOGICAL_NAME)
+            .build();
+      } else {
+        schema = SchemaBuilder
+            .string()
+            .defaultValue("")
+            .optional()
+            .build();
+      }
     } else if (value instanceof ArrayList) {
       List list = (ArrayList) value;
       schema = SchemaBuilder
@@ -335,6 +354,40 @@ public class JSONConverter implements Converter, HeaderConverter {
       throw new DataException(("wrong value detection of " + value));
     }
     return schema;
+  }
+
+  private boolean isStringAnInteger(String value) {
+    try {
+      Integer.valueOf(value);
+      return true;
+    } catch (Exception ex){
+      return false;
+    }
+  }
+
+  private boolean isStringAFloat(String value) {
+    try {
+      Float.valueOf(value);
+      return true;
+    } catch (Exception ex){
+      return false;
+    }
+  }
+
+  private boolean isStringADate(String key, String value) {
+    if (key.toLowerCase().endsWith("_dt")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean isStringATimestamp(String key, String value) {
+    if (key.toLowerCase().endsWith("_ts")) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
