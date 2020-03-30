@@ -10,9 +10,9 @@ import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 
-public class CustomOracleDatabaseDialog extends OracleDatabaseDialect {
+public class CustomOracleDatabaseDialect extends OracleDatabaseDialect {
 
-  public CustomOracleDatabaseDialog(AbstractConfig config) {
+  public CustomOracleDatabaseDialect(AbstractConfig config) {
     super(config);
   }
 
@@ -21,12 +21,12 @@ public class CustomOracleDatabaseDialog extends OracleDatabaseDialect {
    */
   public static class Provider extends SubprotocolBasedProvider {
     public Provider() {
-      super(CustomOracleDatabaseDialog.class.getSimpleName(), "customOracle");
+      super(CustomOracleDatabaseDialect.class.getSimpleName(), "customOracle");
     }
 
     @Override
     public DatabaseDialect create(AbstractConfig config) {
-      return new CustomOracleDatabaseDialog(config);
+      return new CustomOracleDatabaseDialect(config);
     }
   }
 
