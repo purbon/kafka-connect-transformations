@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.EnumMap;
@@ -230,13 +231,16 @@ public class JSONConverter implements Converter, HeaderConverter {
       @Override
       public Object toConnect(final Schema schema, final JsonNode value) {
         String valueAsText = value.asText();
-        Long valueAsLong = -1L;
+        String pattern = "YYYYMMDDHHmmssSSSSSSS";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        java.util.Date parsedDate = null;
         try {
-          valueAsLong = Long.valueOf(valueAsText);
-          return Timestamp.toLogical(schema, valueAsLong);
+          parsedDate = dateFormat.parse(valueAsText);
+          java.sql.Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+          Timestamp.toLogical(schema, parsedDate.getTime());
+          return
         } catch (Exception ex){
-          ex.printStackTrace();
-          throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+valueAsLong);
+          throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+parsedDate);
         }
       }
     });
