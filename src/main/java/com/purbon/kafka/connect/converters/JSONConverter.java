@@ -324,7 +324,7 @@ public class JSONConverter implements Converter, HeaderConverter {
             .build();
       } else if (isStringATimestamp(key, valueAsString)) {
         schema = SchemaBuilder
-            .string()
+            .int64()
             .name(Timestamp.LOGICAL_NAME)
             .build();
       } else if (isStringAnInteger(valueAsString)) {
