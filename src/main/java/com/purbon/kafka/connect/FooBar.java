@@ -17,7 +17,7 @@ public class FooBar {
     Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
 
 
-    System.out.println(timestamp);
+    System.out.println(parsedDate);
   }
 
 }
