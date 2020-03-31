@@ -237,8 +237,7 @@ public class JSONConverter implements Converter, HeaderConverter {
         try {
           parsedDate = dateFormat.parse(valueAsText);
           java.sql.Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-          Timestamp.toLogical(schema, parsedDate.getTime());
-          return
+          return Timestamp.toLogical(schema, parsedDate.getTime());
         } catch (Exception ex){
           throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+parsedDate);
         }
