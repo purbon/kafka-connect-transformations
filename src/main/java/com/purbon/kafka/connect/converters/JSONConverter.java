@@ -198,9 +198,17 @@ public class JSONConverter implements Converter, HeaderConverter {
 
       @Override
       public Object toConnect(final Schema schema, final JsonNode value) {
-        if (!(value.isInt()))
-          throw new DataException("Invalid type for Date, underlying representation should be integer but was " + value.getNodeType());
-        return Date.toLogical(schema, value.intValue());
+        String valueAsText = value.asText();
+        String pattern = "YYYYMMDDHHmmss";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        java.util.Date parsedDate = null;
+        try {
+          parsedDate = dateFormat.parse(valueAsText);
+          return parsedDate;
+        } catch (Exception ex){
+          throw new DataException("Invalid type for Date, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+parsedDate);
+        }
+
       }
     });
 
