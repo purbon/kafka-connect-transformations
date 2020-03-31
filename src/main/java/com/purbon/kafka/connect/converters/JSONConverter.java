@@ -317,11 +317,7 @@ public class JSONConverter implements Converter, HeaderConverter {
       schema = Schema.FLOAT64_SCHEMA;
     } else if (value instanceof String) {
       String valueAsString = String.valueOf(value);
-      if (isStringAnInteger(valueAsString)) {
-        schema = Schema.INT64_SCHEMA;
-      } else if (isStringAFloat(valueAsString)) {
-        schema = Schema.FLOAT64_SCHEMA;
-      } else if (isStringADate(key, valueAsString)) {
+      if (isStringADate(key, valueAsString)) {
         schema = SchemaBuilder
             .string()
             .name(Date.LOGICAL_NAME)
@@ -331,6 +327,10 @@ public class JSONConverter implements Converter, HeaderConverter {
             .string()
             .name(Timestamp.LOGICAL_NAME)
             .build();
+      } else if (isStringAnInteger(valueAsString)) {
+        schema = Schema.INT64_SCHEMA;
+      } else if (isStringAFloat(valueAsString)) {
+        schema = Schema.FLOAT64_SCHEMA;
       } else {
         schema = SchemaBuilder
             .string()
