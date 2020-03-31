@@ -230,11 +230,13 @@ public class JSONConverter implements Converter, HeaderConverter {
       @Override
       public Object toConnect(final Schema schema, final JsonNode value) {
         String valueAsText = value.asText();
+        Long valueAsLong = -1L;
         try {
-          Long valueAsLong = Long.valueOf(valueAsText);
+          valueAsLong = Long.valueOf(valueAsText);
           return Timestamp.toLogical(schema, valueAsLong);
         } catch (Exception ex){
-          throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType());
+          ex.printStackTrace();
+          throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+valueAsLong);
         }
       }
     });
