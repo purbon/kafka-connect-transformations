@@ -9,8 +9,8 @@ public class FooBar {
 
   public static void main(String[] args) throws ParseException {
 
-    String timestampAsString = "20200316151852164214";
-    String pattern = "YYYYMMDDHHmmssSSSSSSS";
+    String timestampAsString = "20201118000000";
+    String pattern = "YYYYMMDDHHmmss";
 
     SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
     Date parsedDate = dateFormat.parse(timestampAsString);
