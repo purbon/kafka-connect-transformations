@@ -229,9 +229,13 @@ public class JSONConverter implements Converter, HeaderConverter {
 
       @Override
       public Object toConnect(final Schema schema, final JsonNode value) {
-        if (!(value.isIntegralNumber()))
+        String valueAsText = value.asText();
+        try {
+          Long valueAsLong = Long.valueOf(valueAsText);
+          return Timestamp.toLogical(schema, valueAsLong);
+        } catch (Exception ex){
           throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType());
-        return Timestamp.toLogical(schema, value.longValue());
+        }
       }
     });
   }
@@ -324,7 +328,7 @@ public class JSONConverter implements Converter, HeaderConverter {
             .build();
       } else if (isStringATimestamp(key, valueAsString)) {
         schema = SchemaBuilder
-            .int64()
+            .string()
             .name(Timestamp.LOGICAL_NAME)
             .build();
       } else if (isStringAnInteger(valueAsString)) {
