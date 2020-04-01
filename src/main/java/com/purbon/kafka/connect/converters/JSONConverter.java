@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -265,6 +263,10 @@ public class JSONConverter implements Converter, HeaderConverter {
         }
       }
     });
+  }
+
+  public static HashMap<String, LogicalTypeConverter> getLogicalConverters() {
+    return LOGICAL_CONVERTERS;
   }
 
   ObjectMapper mapper = new ObjectMapper();
