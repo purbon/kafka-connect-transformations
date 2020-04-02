@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.purbon.kafka.connect</groupId>
-  <artifactId>JdbcDialog</artifactId>
+  <artifactId>CustomJdbcDialog</artifactId>
   <version>0.1</version>
 
   <repositories>
