@@ -1,6 +1,8 @@
 package com.purbon.kafka.connect.converters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Timestamp;
+import java.time.temporal.TemporalField;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,7 +78,7 @@ public class JsonConverterTest {
   }
 
   @Test
-  public void testJsonStringAsTimestampWithoutTSTag() {
+  public void testJsonStringAsDateWithoutDTTag() {
 
     Map<String, Object> objectConfig = new HashMap<>();
     objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
@@ -90,5 +92,77 @@ public class JsonConverterTest {
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
     Struct struct = (Struct)sav.value();
     Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
+    Assert.assertEquals(2020, ((Date)struct.get("foo")).getYear()+1900);
+    Assert.assertEquals(11, ((Date)struct.get("foo")).getMonth()+1);
+    Assert.assertEquals(18, ((Date)struct.get("foo")).getDate());
   }
+
+  @Test
+  public void testJsonStringAsTimestampWithoutTSTag() {
+
+    Map<String, Object> objectConfig = new HashMap<>();
+    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+    objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
+
+    JSONConverter converter = new JSONConverter();
+    converter.configure(objectConfig);
+
+    String jsonString = "{\"foo\":\"20200203090732000000\"}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Struct struct = (Struct)sav.value();
+    Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
+    Assert.assertEquals(2020, ((Date)struct.get("foo")).getYear()+1900);
+    Assert.assertEquals(2, ((Date)struct.get("foo")).getMonth()+1);
+    Assert.assertEquals(3, ((Date)struct.get("foo")).getDate());
+    Assert.assertEquals(9, ((Date)struct.get("foo")).getHours());
+    Assert.assertEquals(7, ((Date)struct.get("foo")).getMinutes());
+    Assert.assertEquals(32, ((Date)struct.get("foo")).getSeconds());
+  }
+
+  @Test
+  public void testJsonStringAsTimestampWithCustomPattern() {
+
+    Map<String, Object> objectConfig = new HashMap<>();
+    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+    objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
+    objectConfig.put(JsonConverterConfig.TS_PATTERN_CONFIG, "yyyyMMddHHmmss");
+
+    JSONConverter converter = new JSONConverter();
+    converter.configure(objectConfig);
+
+    String jsonString = "{\"foo\":\"20200203090732\"}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Struct struct = (Struct)sav.value();
+    Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
+    Assert.assertEquals(2020, ((Date)struct.get("foo")).getYear()+1900);
+    Assert.assertEquals(2, ((Date)struct.get("foo")).getMonth()+1);
+    Assert.assertEquals(3, ((Date)struct.get("foo")).getDate());
+    Assert.assertEquals(9, ((Date)struct.get("foo")).getHours());
+    Assert.assertEquals(7, ((Date)struct.get("foo")).getMinutes());
+    Assert.assertEquals(32, ((Date)struct.get("foo")).getSeconds());
+  }
+
+  @Test
+  public void testJsonStringAsDateWithCustomPattern() {
+
+    Map<String, Object> objectConfig = new HashMap<>();
+    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+    objectConfig.put(JsonConverterConfig.DT_ATTRS_CONFIG, Arrays.asList("foo"));
+    objectConfig.put(JsonConverterConfig.DT_PATTERN_CONFIG, "yyyy.MM.dd");
+
+    JSONConverter converter = new JSONConverter();
+    converter.configure(objectConfig);
+
+    String jsonString = "{\"foo\":\"2020.12.29\"}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Struct struct = (Struct)sav.value();
+    Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
+    Assert.assertEquals(2020, ((Date)struct.get("foo")).getYear()+1900);
+    Assert.assertEquals(12, ((Date)struct.get("foo")).getMonth()+1);
+    Assert.assertEquals(29, ((Date)struct.get("foo")).getDate());
+  }
+
 }
