@@ -1,12 +1,20 @@
 package com.purbon.kafka.connect.converters.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.purbon.kafka.connect.converters.DataTypeConverter;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
 
-public class StructConnectTypeConverter extends AbstractConnectTypeConverter {
+public class StructConnectTypeConverter implements JsonToConnectTypeConverter {
+
+  private final DataTypeConverter converter;
+
+  public StructConnectTypeConverter(DataTypeConverter converter) {
+    this.converter = converter;
+  }
+
   @Override
   public Object convert(Schema schema, JsonNode value) {
     if (!value.isObject())
@@ -18,7 +26,7 @@ public class StructConnectTypeConverter extends AbstractConnectTypeConverter {
     // just returns the schema Object and has no overhead.
     Struct result = new Struct(schema.schema());
     for (Field field : schema.fields())
-      result.put(field, convertToConnect(field.schema(), value.get(field.name())));
+      result.put(field, converter.convertToConnect(field.schema(), value.get(field.name())));
 
     return result;
   }

@@ -1,10 +1,6 @@
 package com.purbon.kafka.connect.converters;
 
-
-import static com.purbon.kafka.connect.converters.json.AbstractConnectTypeConverter.convertToConnect;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 import org.apache.kafka.common.config.ConfigDef;
@@ -18,15 +14,17 @@ public class JSONConverter implements Converter, HeaderConverter {
 
   private JsonConverterConfig config;
   private JSONUtils utils;
+  private DataTypeConverter converter;
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     //empty
   }
 
   public void configure(Map<String, ?> configs) {
     this.config = new JsonConverterConfig(configs);
     this.utils = new JSONUtils(config);
+    this.converter = new DataTypeConverter(config);
   }
 
   @Override
@@ -64,7 +62,7 @@ public class JSONConverter implements Converter, HeaderConverter {
 
     try {
       return new SchemaAndValue(schema,
-          convertToConnect(schema, JSONUtils.toJsonNode(jsonString)));
+          converter.convertToConnect(schema, JSONUtils.toJsonNode(jsonString)));
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       throw new DataException("json with incorrect format");

@@ -1,6 +1,7 @@
 package com.purbon.kafka.connect.converters.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.purbon.kafka.connect.converters.DataTypeConverter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,7 +9,13 @@ import java.util.Map.Entry;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.DataException;
 
-public class MapConnectTypeConverter extends AbstractConnectTypeConverter {
+public class MapConnectTypeConverter implements JsonToConnectTypeConverter {
+
+  private final DataTypeConverter converter;
+
+  public MapConnectTypeConverter(DataTypeConverter converter) {
+    this.converter = converter;
+  }
 
   @Override
   public Object convert(Schema schema, JsonNode value) {
@@ -25,7 +32,7 @@ public class MapConnectTypeConverter extends AbstractConnectTypeConverter {
       Iterator<Entry<String, JsonNode>> fieldIt = value.fields();
       while (fieldIt.hasNext()) {
         Map.Entry<String, JsonNode> entry = fieldIt.next();
-        result.put(entry.getKey(), convertToConnect(valueSchema, entry.getValue()));
+        result.put(entry.getKey(), converter.convertToConnect(valueSchema, entry.getValue()));
       }
     } else {
       if (!value.isArray())
@@ -35,8 +42,8 @@ public class MapConnectTypeConverter extends AbstractConnectTypeConverter {
           throw new DataException("Found invalid map entry instead of array tuple: " + entry.getNodeType());
         if (entry.size() != 2)
           throw new DataException("Found invalid map entry, expected length 2 but found :" + entry.size());
-        result.put(convertToConnect(keySchema, entry.get(0)),
-            convertToConnect(valueSchema, entry.get(1)));
+        result.put(converter.convertToConnect(keySchema, entry.get(0)),
+                   converter.convertToConnect(valueSchema, entry.get(1)));
       }
     }
     return result;

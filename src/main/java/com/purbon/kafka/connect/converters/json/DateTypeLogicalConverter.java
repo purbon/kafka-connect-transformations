@@ -10,6 +10,12 @@ import org.apache.kafka.connect.errors.DataException;
 
 public class DateTypeLogicalConverter implements LogicalTypeConverter {
 
+  private final JsonConverterConfig config;
+
+  public DateTypeLogicalConverter(JsonConverterConfig config) {
+    this.config = config;
+  }
+
   @Override
   public JsonNode toJson(final Schema schema, final Object value, final JsonConverterConfig config) {
     if (!(value instanceof java.util.Date))
@@ -20,7 +26,7 @@ public class DateTypeLogicalConverter implements LogicalTypeConverter {
   @Override
   public Object toConnect(final Schema schema, final JsonNode value) {
     String valueAsText = value.asText();
-    String pattern = "YYYYMMDDHHmmss";
+    String pattern = config.getDatePattern();
     SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
     java.util.Date parsedDate = null;
     try {
