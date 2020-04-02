@@ -1,5 +1,8 @@
 package com.purbon.kafka.connect.converters;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
@@ -13,6 +16,12 @@ public class JsonConverterConfig extends ConverterConfig {
   public static final boolean SCHEMAS_ENABLE_DEFAULT = true;
   private static final String SCHEMAS_ENABLE_DOC = "Include schemas within each of the serialized values and keys.";
   private static final String SCHEMAS_ENABLE_DISPLAY = "Enable Schemas";
+
+  public static final String TS_ATTRS_CONFIG = "timestamp.attrs";
+  public static final List<String> TS_ATTRS_DEFAULT = new ArrayList<String>();
+  private static final String TS_ATTRS_DOC = "List of attributes to be converted to Timestamp";
+  private static final String TS_ATTRS_DISPLAY = "Attributes with TS data type";
+
 
   private final static ConfigDef CONFIG;
 
@@ -28,15 +37,37 @@ public class JsonConverterConfig extends ConverterConfig {
         group,
         orderInGroup++,
         Width.MEDIUM,
-        SCHEMAS_ENABLE_DISPLAY);
+        SCHEMAS_ENABLE_DISPLAY)
+        .define( TS_ATTRS_CONFIG,
+        Type.LIST,
+        TS_ATTRS_DEFAULT,
+        Importance.HIGH,
+        TS_ATTRS_DOC,
+        group,
+        orderInGroup++,
+        Width.MEDIUM,
+        TS_ATTRS_DISPLAY
+        );
   }
 
   public static ConfigDef configDef() {
     return CONFIG;
   }
 
+  private boolean schemasEnabled;
+  private List<String> timestampAttributes;
 
   protected JsonConverterConfig(Map<String, ?> props) {
     super(CONFIG, props);
+    this.schemasEnabled = getBoolean(SCHEMAS_ENABLE_CONFIG);
+    this.timestampAttributes = getList(TS_ATTRS_CONFIG);
+  }
+
+  public List<String> getTimestampAttributes() {
+    return timestampAttributes;
+  }
+
+  public boolean isSchemasEnabled() {
+    return schemasEnabled;
   }
 }

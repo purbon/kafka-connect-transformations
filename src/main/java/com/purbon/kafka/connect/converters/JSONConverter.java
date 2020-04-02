@@ -276,9 +276,8 @@ public class JSONConverter implements Converter, HeaderConverter {
     //empty
   }
 
-  @Override
   public void configure(Map<String, ?> configs) {
-    //TODO process config
+    this.config = new JsonConverterConfig(configs);
   }
 
   @Override
@@ -416,7 +415,8 @@ public class JSONConverter implements Converter, HeaderConverter {
   }
 
   private boolean isStringATimestamp(String key, String value) {
-    if (key.toLowerCase().endsWith("_ts")) {
+    List<String> timestampAttributes = config.getTimestampAttributes();
+    if (key.toLowerCase().endsWith("_ts") || timestampAttributes.contains(key)) {
       return true;
     } else {
       return false;

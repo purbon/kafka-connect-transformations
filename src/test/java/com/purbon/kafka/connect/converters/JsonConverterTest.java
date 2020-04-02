@@ -1,14 +1,18 @@
 package com.purbon.kafka.connect.converters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Schema.Type;
 import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.json.JsonConverter;
+import org.apache.kafka.connect.storage.ConverterConfig;
+import org.apache.kafka.connect.storage.ConverterType;
 import org.junit.Assert;
 import org.junit.Test;
+import java.util.Map;
 
 public class JsonConverterTest {
 
@@ -62,4 +66,22 @@ public class JsonConverterTest {
     Assert.assertEquals(Date.class.getCanonicalName(), struct.get("bar_ts").getClass().getCanonicalName());
   }
 
+  @Test
+  public void testJsonStringAsTimestampWithoutTSTag() {
+
+    Map<String, Object> objectConfig = new HashMap<>();
+    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+    objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
+
+    JSONConverter converter = new JSONConverter();
+    converter.configure(objectConfig);
+
+    String jsonString = "{\"foo\":\"20200203090732000000\"}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Struct struct = (Struct)sav.value();
+    Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
+
+
+  }
 }
