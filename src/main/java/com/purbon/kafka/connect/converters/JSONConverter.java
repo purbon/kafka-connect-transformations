@@ -2,9 +2,7 @@ package com.purbon.kafka.connect.converters;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,7 +12,6 @@ import java.util.Base64;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.Date;
@@ -22,7 +19,6 @@ import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;
-import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
@@ -265,13 +261,11 @@ public class JSONConverter implements Converter, HeaderConverter {
     });
   }
 
-  private JsonConversionUtils utils;
+  private JSONUtils utils;
 
   public static HashMap<String, LogicalTypeConverter> getLogicalConverters() {
     return LOGICAL_CONVERTERS;
   }
-
-  ObjectMapper mapper = new ObjectMapper();
 
   @Override
   public void close() throws IOException {
@@ -280,7 +274,7 @@ public class JSONConverter implements Converter, HeaderConverter {
 
   public void configure(Map<String, ?> configs) {
     this.config = new JsonConverterConfig(configs);
-    this.utils = new JsonConversionUtils(config);
+    this.utils = new JSONUtils(config);
   }
 
   @Override
@@ -293,9 +287,8 @@ public class JSONConverter implements Converter, HeaderConverter {
 
     String jsonString = null;
     try {
-      jsonString = mapper.writeValueAsString(value);
+      jsonString = JSONUtils.toString(value);
     } catch (JsonProcessingException e) {
-      e.printStackTrace();
       throw new DataException("Json with incorrect format");
     }
     return Base64.getEncoder().encode(jsonString.getBytes());
@@ -311,7 +304,7 @@ public class JSONConverter implements Converter, HeaderConverter {
     String jsonString = new String(value);
     Schema schema = null;
     try {
-      schema = inspectJSONSchema(jsonString);
+      schema = utils.buildSchemaFromJSONString(jsonString);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       throw new DataException("json with incorrect format");
@@ -319,82 +312,11 @@ public class JSONConverter implements Converter, HeaderConverter {
 
     try {
       return new SchemaAndValue(schema,
-          convertToConnect(schema, mapper.readTree(jsonString)));
+          convertToConnect(schema, JSONUtils.toJsonNode(jsonString)));
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       throw new DataException("json with incorrect format");
     }
-  }
-
-  private Schema inspectJSONSchema(String jsonString) throws JsonProcessingException {
-    TypeReference<HashMap<Object, Object>> typeRef = new TypeReference<HashMap<Object, Object>>() {
-    };
-
-    Map<Object, Object> object = mapper.readValue(jsonString, typeRef);
-
-    SchemaBuilder struct = SchemaBuilder.struct();
-    for (Object key : object.keySet()) {
-      Object value = object.get(key);
-      Schema schema = buildSchema(key.toString(), value);
-      struct.field(key.toString(), schema);
-    }
-
-    return struct.build();
-  }
-
-  private Schema buildSchema(String key, Object value) {
-    Schema schema;
-    if (value instanceof Integer) {
-      schema = Schema.INT64_SCHEMA;
-    } else if (value instanceof Boolean) {
-      schema = Schema.BOOLEAN_SCHEMA;
-    } else if (value instanceof Double) {
-      schema = Schema.FLOAT64_SCHEMA;
-    } else if (value instanceof String) {
-      String valueAsString = String.valueOf(value);
-      schema = detectDataTypeWithinString(key, valueAsString);
-    } else if (value instanceof ArrayList) {
-      List list = (ArrayList) value;
-      schema = SchemaBuilder
-          .array(buildSchema(key, list.get(0)))
-          .build();
-    } else if (value instanceof HashMap) {
-      SchemaBuilder builder = SchemaBuilder.struct();
-      Map<String, Object> map = (Map) value;
-      for (String myKey : map.keySet()) {
-        builder.field(myKey, buildSchema(key, map.get(myKey)));
-      }
-      schema = builder.build();
-    } else {
-      throw new DataException(("wrong value detection of " + value));
-    }
-    return schema;
-  }
-
-  private Schema detectDataTypeWithinString(String key, String value) {
-    Schema schema;
-    if (utils.isStringADate(key, value)) {
-      schema = SchemaBuilder
-          .string()
-          .name(Date.LOGICAL_NAME)
-          .build();
-    } else if (utils.isStringATimestamp(key, value)) {
-      schema = SchemaBuilder
-          .string()
-          .name(Timestamp.LOGICAL_NAME)
-          .build();
-    } else if (utils.isStringAnInteger(value)) {
-      schema = Schema.INT64_SCHEMA;
-    } else if (utils.isStringAFloat(value)) {
-      schema = Schema.FLOAT64_SCHEMA;
-    } else {
-      schema = SchemaBuilder
-          .string()
-          .defaultValue("")
-          .optional()
-          .build();
-    }
-    return schema;
   }
 
   @Override
