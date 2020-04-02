@@ -11,6 +11,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.storage.ConverterConfig;
 import org.apache.kafka.connect.storage.ConverterType;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import java.util.Map;
 
@@ -19,6 +20,14 @@ public class JsonConverterTest {
 
   ObjectMapper mapper = new ObjectMapper();
   JSONConverter converter = new JSONConverter();
+
+  @Before
+  public void setup() {
+    Map<String, Object> objectConfig = new HashMap<>();
+    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    converter.configure(objectConfig);
+  }
+
 
   @Test
   public void testJsonKeyValueConversion() {
@@ -72,16 +81,14 @@ public class JsonConverterTest {
     Map<String, Object> objectConfig = new HashMap<>();
     objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
-    objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
+    objectConfig.put(JsonConverterConfig.DT_ATTRS_CONFIG, Arrays.asList("foo"));
 
     JSONConverter converter = new JSONConverter();
     converter.configure(objectConfig);
 
-    String jsonString = "{\"foo\":\"20200203090732000000\"}\n";
+    String jsonString = "{\"foo\":\"20201118000000\"}\n";
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
     Struct struct = (Struct)sav.value();
     Assert.assertEquals(Date.class.getCanonicalName(), struct.get("foo").getClass().getCanonicalName());
-
-
   }
 }

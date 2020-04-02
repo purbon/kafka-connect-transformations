@@ -13,13 +13,23 @@ import org.junit.Test;
 public class JsonConverterConfigTest {
 
   @Test
-  public void shouldProcessTypesProperly() {
+  public void shouldProcessTSTypesProperly() {
     Map<String, Object> configValues = new HashMap<>();
     configValues.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     configValues.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("NuMeRiC"));
 
     final JsonConverterConfig config = new JsonConverterConfig(configValues);
     assertEquals(config.getTimestampAttributes().size(),1 );
+  }
+
+  @Test
+  public void shouldProcessDTTypesProperly() {
+    Map<String, Object> configValues = new HashMap<>();
+    configValues.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
+    configValues.put(JsonConverterConfig.DT_ATTRS_CONFIG, Arrays.asList("NuMeRiC"));
+
+    final JsonConverterConfig config = new JsonConverterConfig(configValues);
+    assertEquals(config.getDateAttributes().size(),1 );
   }
 
 }

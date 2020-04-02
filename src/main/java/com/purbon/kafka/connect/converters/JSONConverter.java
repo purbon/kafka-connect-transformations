@@ -407,7 +407,8 @@ public class JSONConverter implements Converter, HeaderConverter {
   }
 
   private boolean isStringADate(String key, String value) {
-    if (key.toLowerCase().endsWith("_dt")) {
+    List<String> dateAttributes = config.getDateAttributes();
+    if (key.toLowerCase().endsWith("_dt") || dateAttributes.contains(key)) {
       return true;
     } else {
       return false;
