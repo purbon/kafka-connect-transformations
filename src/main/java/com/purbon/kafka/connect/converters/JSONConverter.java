@@ -16,6 +16,7 @@ import org.apache.kafka.connect.storage.HeaderConverter;
 
 public class JSONConverter implements Converter, HeaderConverter {
 
+  private JsonConverterConfig config;
   private JSONUtils utils;
 
   @Override
@@ -79,9 +80,6 @@ public class JSONConverter implements Converter, HeaderConverter {
   public byte[] fromConnectHeader(String topic, String headerKey, Schema schema, Object value) {
     return fromConnectData(topic, schema, value);
   }
-
-  private JsonConverterConfig config;
-
 
   @Override
   public ConfigDef config() {
