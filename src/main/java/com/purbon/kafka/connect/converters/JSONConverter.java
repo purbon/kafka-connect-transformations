@@ -265,6 +265,8 @@ public class JSONConverter implements Converter, HeaderConverter {
     });
   }
 
+  private JsonConversionUtils utils;
+
   public static HashMap<String, LogicalTypeConverter> getLogicalConverters() {
     return LOGICAL_CONVERTERS;
   }
@@ -278,6 +280,7 @@ public class JSONConverter implements Converter, HeaderConverter {
 
   public void configure(Map<String, ?> configs) {
     this.config = new JsonConverterConfig(configs);
+    this.utils = new JsonConversionUtils(config);
   }
 
   @Override
@@ -349,27 +352,7 @@ public class JSONConverter implements Converter, HeaderConverter {
       schema = Schema.FLOAT64_SCHEMA;
     } else if (value instanceof String) {
       String valueAsString = String.valueOf(value);
-      if (isStringADate(key, valueAsString)) {
-        schema = SchemaBuilder
-            .string()
-            .name(Date.LOGICAL_NAME)
-            .build();
-      } else if (isStringATimestamp(key, valueAsString)) {
-        schema = SchemaBuilder
-            .string()
-            .name(Timestamp.LOGICAL_NAME)
-            .build();
-      } else if (isStringAnInteger(valueAsString)) {
-        schema = Schema.INT64_SCHEMA;
-      } else if (isStringAFloat(valueAsString)) {
-        schema = Schema.FLOAT64_SCHEMA;
-      } else {
-        schema = SchemaBuilder
-            .string()
-            .defaultValue("")
-            .optional()
-            .build();
-      }
+      schema = detectDataTypeWithinString(key, valueAsString);
     } else if (value instanceof ArrayList) {
       List list = (ArrayList) value;
       schema = SchemaBuilder
@@ -388,40 +371,30 @@ public class JSONConverter implements Converter, HeaderConverter {
     return schema;
   }
 
-  private boolean isStringAnInteger(String value) {
-    try {
-      Integer.valueOf(value);
-      return true;
-    } catch (Exception ex){
-      return false;
-    }
-  }
-
-  private boolean isStringAFloat(String value) {
-    try {
-      Float.valueOf(value);
-      return true;
-    } catch (Exception ex){
-      return false;
-    }
-  }
-
-  private boolean isStringADate(String key, String value) {
-    List<String> dateAttributes = config.getDateAttributes();
-    if (key.toLowerCase().endsWith("_dt") || dateAttributes.contains(key)) {
-      return true;
+  private Schema detectDataTypeWithinString(String key, String value) {
+    Schema schema;
+    if (utils.isStringADate(key, value)) {
+      schema = SchemaBuilder
+          .string()
+          .name(Date.LOGICAL_NAME)
+          .build();
+    } else if (utils.isStringATimestamp(key, value)) {
+      schema = SchemaBuilder
+          .string()
+          .name(Timestamp.LOGICAL_NAME)
+          .build();
+    } else if (utils.isStringAnInteger(value)) {
+      schema = Schema.INT64_SCHEMA;
+    } else if (utils.isStringAFloat(value)) {
+      schema = Schema.FLOAT64_SCHEMA;
     } else {
-      return false;
+      schema = SchemaBuilder
+          .string()
+          .defaultValue("")
+          .optional()
+          .build();
     }
-  }
-
-  private boolean isStringATimestamp(String key, String value) {
-    List<String> timestampAttributes = config.getTimestampAttributes();
-    if (key.toLowerCase().endsWith("_ts") || timestampAttributes.contains(key)) {
-      return true;
-    } else {
-      return false;
-    }
+    return schema;
   }
 
   @Override
