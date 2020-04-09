@@ -2,13 +2,17 @@ package com.purbon.kafka.connect.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.storage.Converter;
+import org.apache.kafka.connect.storage.ConverterConfig;
+import org.apache.kafka.connect.storage.ConverterType;
 import org.apache.kafka.connect.storage.HeaderConverter;
+import org.apache.kafka.connect.storage.StringConverterConfig;
 
 public class JSONConverter implements Converter, HeaderConverter {
 
@@ -21,6 +25,7 @@ public class JSONConverter implements Converter, HeaderConverter {
     //empty
   }
 
+  @Override
   public void configure(Map<String, ?> configs) {
     this.config = new JsonConverterConfig(configs);
     this.utils = new JSONUtils(config);
@@ -29,7 +34,9 @@ public class JSONConverter implements Converter, HeaderConverter {
 
   @Override
   public void configure(Map<String, ?> configs, boolean isKey) {
-    configure(configs);
+    Map<String, Object> conf = new HashMap<>(configs);
+    conf.put(StringConverterConfig.TYPE_CONFIG, isKey ? ConverterType.KEY.getName() : ConverterType.VALUE.getName());
+    configure(conf);
   }
 
   @Override

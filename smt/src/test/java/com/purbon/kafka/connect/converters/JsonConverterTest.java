@@ -81,12 +81,11 @@ public class JsonConverterTest {
   public void testJsonStringAsDateWithoutDTTag() {
 
     Map<String, Object> objectConfig = new HashMap<>();
-    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
     objectConfig.put(JsonConverterConfig.DT_ATTRS_CONFIG, Arrays.asList("foo"));
 
     JSONConverter converter = new JSONConverter();
-    converter.configure(objectConfig);
+    converter.configure(objectConfig, false);
 
     String jsonString = "{\"foo\":\"20201118000000\"}\n";
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
@@ -101,12 +100,11 @@ public class JsonConverterTest {
   public void testJsonStringAsTimestampWithoutTSTag() {
 
     Map<String, Object> objectConfig = new HashMap<>();
-    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
     objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
 
     JSONConverter converter = new JSONConverter();
-    converter.configure(objectConfig);
+    converter.configure(objectConfig, false);
 
     String jsonString = "{\"foo\":\"20200203090732000000\"}\n";
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
@@ -124,13 +122,12 @@ public class JsonConverterTest {
   public void testJsonStringAsTimestampWithCustomPattern() {
 
     Map<String, Object> objectConfig = new HashMap<>();
-    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
     objectConfig.put(JsonConverterConfig.TS_ATTRS_CONFIG, Arrays.asList("foo"));
     objectConfig.put(JsonConverterConfig.TS_PATTERN_CONFIG, "yyyyMMddHHmmss");
 
     JSONConverter converter = new JSONConverter();
-    converter.configure(objectConfig);
+    converter.configure(objectConfig, false);
 
     String jsonString = "{\"foo\":\"20200203090732\"}\n";
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
@@ -148,13 +145,12 @@ public class JsonConverterTest {
   public void testJsonStringAsDateWithCustomPattern() {
 
     Map<String, Object> objectConfig = new HashMap<>();
-    objectConfig.put(ConverterConfig.TYPE_CONFIG, ConverterType.KEY.getName());
     objectConfig.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
     objectConfig.put(JsonConverterConfig.DT_ATTRS_CONFIG, Arrays.asList("foo"));
     objectConfig.put(JsonConverterConfig.DT_PATTERN_CONFIG, "yyyy.MM.dd");
 
     JSONConverter converter = new JSONConverter();
-    converter.configure(objectConfig);
+    converter.configure(objectConfig, false);
 
     String jsonString = "{\"foo\":\"2020.12.29\"}\n";
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
