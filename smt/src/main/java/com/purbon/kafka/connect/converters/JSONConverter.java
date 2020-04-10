@@ -46,7 +46,7 @@ public class JSONConverter implements Converter, HeaderConverter {
     try {
       jsonString = JSONUtils.toString(value);
     } catch (JsonProcessingException e) {
-      throw new DataException("Json with incorrect format");
+      throw new DataException(e);
     }
     return Base64.getEncoder().encode(jsonString.getBytes());
   }
@@ -64,7 +64,7 @@ public class JSONConverter implements Converter, HeaderConverter {
       schema = utils.buildSchemaFromJSONString(jsonString);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
-      throw new DataException("json with incorrect format");
+      throw new DataException(e);
     }
 
     try {
