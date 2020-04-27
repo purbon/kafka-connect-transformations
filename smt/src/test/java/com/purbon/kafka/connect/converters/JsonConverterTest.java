@@ -51,6 +51,9 @@ public class JsonConverterTest {
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
     Schema schema = sav.schema();
     Assert.assertEquals(Type.INT64, schema.field("bar").schema().type());
+
+    Struct value = (Struct) sav.value();
+    Assert.assertEquals(12345L, value.get("bar"));
   }
 
   @Test
@@ -59,6 +62,9 @@ public class JsonConverterTest {
     SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
     Schema schema = sav.schema();
     Assert.assertEquals(Type.FLOAT64, schema.field("bar").schema().type());
+
+    Struct value = (Struct) sav.value();
+    Assert.assertEquals(12345.234D, value.get("bar"));
   }
 
   @Test
