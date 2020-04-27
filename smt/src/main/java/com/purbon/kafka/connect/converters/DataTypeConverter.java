@@ -103,10 +103,10 @@ public class DataTypeConverter {
   private void configureConnectConverters(JsonConverterConfig config) {
     TO_CONNECT_CONVERTERS.put(Schema.Type.BOOLEAN, (schema, value) -> Boolean.valueOf(value.asText()));
     TO_CONNECT_CONVERTERS.put(Schema.Type.INT8, (schema, value) -> Byte.valueOf(value.asText()));
-    TO_CONNECT_CONVERTERS.put(Schema.Type.INT16, (schema, value) -> (short) Short.valueOf(value.asText()));
+    TO_CONNECT_CONVERTERS.put(Schema.Type.INT16, (schema, value) -> Short.valueOf(value.asText()));
     TO_CONNECT_CONVERTERS.put(Schema.Type.INT32, (schema, value) -> Integer.valueOf(value.asText()));
     TO_CONNECT_CONVERTERS.put(Schema.Type.INT64, (schema, value) -> Long.valueOf(value.asText()));
-    TO_CONNECT_CONVERTERS.put(Schema.Type.FLOAT32, (schema, value) -> value.floatValue());
+    TO_CONNECT_CONVERTERS.put(Schema.Type.FLOAT32, (schema, value) -> Float.valueOf(value.asText()));
     TO_CONNECT_CONVERTERS.put(Schema.Type.FLOAT64, (schema, value) -> Double.valueOf(value.asText()));
     TO_CONNECT_CONVERTERS.put(Schema.Type.BYTES, (schema, value) -> {
       try {
