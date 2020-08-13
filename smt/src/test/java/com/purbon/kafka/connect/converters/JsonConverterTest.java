@@ -96,6 +96,21 @@ public class JsonConverterTest {
   }
 
   @Test
+  public void testJsonStringWithMSAsTimestampConversion() {
+    String jsonString = "{\"bar_ts\":\"20200813095235826000\"}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Struct struct = (Struct)sav.value();
+    Assert.assertEquals(Date.class.getCanonicalName(), struct.get("bar_ts").getClass().getCanonicalName());
+
+    Assert.assertEquals(2020, ((Date)struct.get("bar_ts")).getYear()+1900);
+    Assert.assertEquals(8, ((Date)struct.get("bar_ts")).getMonth()+1);
+    Assert.assertEquals(13, ((Date)struct.get("bar_ts")).getDate());
+    Assert.assertEquals(9, ((Date)struct.get("bar_ts")).getHours());
+    Assert.assertEquals(52, ((Date)struct.get("bar_ts")).getMinutes());
+    Assert.assertEquals(35, ((Date)struct.get("bar_ts")).getSeconds());
+  }
+
+  @Test
   public void testJsonStringAsDateWithoutDTTag() {
 
     Map<String, Object> objectConfig = new HashMap<>();

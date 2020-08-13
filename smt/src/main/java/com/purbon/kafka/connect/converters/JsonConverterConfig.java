@@ -22,7 +22,7 @@ public class JsonConverterConfig extends ConverterConfig {
   private static final String TS_ATTRS_DISPLAY = "Attributes with TS data type";
 
   public static final  String TS_PATTERN_CONFIG = "timestamp.pattern";
-  public static final  String TS_PATTERN_DEFAULT = "yyyyMMddHHmmssSSSSSSS";
+  public static final  String TS_PATTERN_DEFAULT = "yyyyMMddHHmmssSSS";
   private static final String TS_PATTERN_DOC = "Pattern used to detect the incoming timestamp value";
   private static final String TS_PATTERN_DISPLAY = "Timestamp pattern value";
 

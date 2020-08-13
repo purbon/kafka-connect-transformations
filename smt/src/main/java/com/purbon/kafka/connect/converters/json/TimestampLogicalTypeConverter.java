@@ -20,7 +20,7 @@ public class TimestampLogicalTypeConverter implements LogicalTypeConverter {
   public JsonNode toJson(final Schema schema, final Object value, final JsonConverterConfig config) {
     if (value instanceof String) {
       String valueAsText = String.valueOf(value);
-      String pattern = "YYYYMMDDHHmmss";
+      String pattern = "YYYYMMDDHHmmssSSS";
       SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
       java.util.Date parsedDate = null;
       try {
@@ -39,7 +39,7 @@ public class TimestampLogicalTypeConverter implements LogicalTypeConverter {
 
   @Override
   public Object toConnect(final Schema schema, final JsonNode value) {
-    String valueAsText = value.asText();
+    String valueAsText = trimZerosAtEnd(value.asText());
     String pattern = config.getTimestampPattern();
     SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
     java.util.Date parsedDate = null;
@@ -50,5 +50,12 @@ public class TimestampLogicalTypeConverter implements LogicalTypeConverter {
     } catch (Exception ex){
       throw new DataException("Invalid type for Timestamp, underlying representation should be integral but was " + value.getNodeType()+ " "+valueAsText+" "+parsedDate);
     }
+  }
+
+  private String trimZerosAtEnd(String text) {
+    if (text.length() > 17) {
+      text = text.substring(0, 17);
+    }
+    return text;
   }
 }
