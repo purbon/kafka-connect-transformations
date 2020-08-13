@@ -41,8 +41,10 @@ public class JSONUtils {
     SchemaBuilder struct = SchemaBuilder.struct();
     for (Object key : object.keySet()) {
       Object value = object.get(key);
-      Schema schema = buildSchema(key.toString(), value);
-      struct.field(key.toString(), schema);
+      if (value != null) {
+        Schema schema = buildSchema(key.toString(), value);
+        struct.field(key.toString(), schema);
+      }
     }
 
     return struct.build();

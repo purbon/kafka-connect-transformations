@@ -14,6 +14,7 @@ import org.apache.kafka.connect.storage.ConverterConfig;
 import org.apache.kafka.connect.storage.ConverterType;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import java.util.Map;
 
@@ -43,6 +44,17 @@ public class JsonConverterTest {
     Assert.assertEquals(Type.ARRAY, sav.schema().field("zet").schema().type());
     Assert.assertEquals(Type.STRUCT, sav.schema().field("props").schema().type());
     Assert.assertEquals(Type.INT64, sav.schema().field("props").schema().field("foo").schema().type());
+  }
+
+  @Ignore
+  public void testJsonStringAsNullValue() {
+    String jsonString = "{\"bar\":null}\n";
+    SchemaAndValue sav = converter.toConnectData("topic", jsonString.getBytes());
+    Schema schema = sav.schema();
+    Assert.assertEquals(Type.INT64, schema.field("bar").schema().type());
+
+    Struct value = (Struct) sav.value();
+    Assert.assertEquals(12345L, value.get("bar"));
   }
 
   @Test
