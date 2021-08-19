@@ -8,6 +8,11 @@
   <artifactId>smt</artifactId>
   <version>1.0</version>
 
+  <properties>
+    <hamcrest.version>2.2</hamcrest.version>
+    <assertj.version>3.15.0</assertj.version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -15,8 +20,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
       <plugin>
@@ -67,6 +72,13 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
       <scope>test</scope>
     </dependency>
 
