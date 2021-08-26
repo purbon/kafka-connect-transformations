@@ -3,6 +3,7 @@ package com.purbon.kafka.connect.jdbc;
 import io.confluent.connect.jdbc.dialect.DatabaseDialect;
 import io.confluent.connect.jdbc.dialect.DatabaseDialectProvider;
 import io.confluent.connect.jdbc.dialect.SqlServerDatabaseDialect;
+import io.confluent.connect.jdbc.util.DateTimeUtils;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.data.Schema;
 import org.slf4j.Logger;
@@ -39,12 +40,13 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     Timestamp millisTimestamp = Conversions.toTimestampFromMillis((long)value);
                     log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp);
-                    statement.setTimestamp(index, millisTimestamp);
+                    statement.setTimestamp(index, millisTimestamp, DateTimeUtils.getTimeZoneCalendar(timeZone()));
                     return true;
                 case DebeziumTimeUnits.NANOS_TIMESTAMP:
                     Timestamp nanoTimestamp = Conversions.toTimestampFromNanos((long)value);
                     log.debug("TimeConversion[io.debezium.time.NanoTimestamp]: value="+value+" into time="+nanoTimestamp);
-                    statement.setTimestamp(index, nanoTimestamp);
+                    statement.setTimestamp(index, nanoTimestamp, DateTimeUtils.getTimeZoneCalendar(timeZone())
+                    );
                     return true;
                 default:
                     break;
