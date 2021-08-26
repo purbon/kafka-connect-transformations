@@ -1,1 +1,3 @@
 com.purbon.kafka.connect.jdbc.CustomOracleJdbcDialog$Provider
+com.purbon.kafka.connect.jdbc.CustomMySqlJdbcDialect$Provider
+com.purbon.kafka.connect.jdbc.CustomSqlServerJdbcDialect$Provider

@@ -6,7 +6,7 @@
 
   <groupId>com.purbon.kafka.connect</groupId>
   <artifactId>CustomJdbcDialog</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
 
   <repositories>
     <repository>
@@ -15,15 +15,48 @@
     </repository>
   </repositories>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- plugins -->
+    <maven-pmd-plugin.version>3.12.0</maven-pmd-plugin.version>
+    <spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
+    <maven-site-plugin.version>3.9.0</maven-site-plugin.version>
+    <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
+    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+    <rpm-maven-plugin.version>2.2.0</rpm-maven-plugin.version>
+    <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+    <!-- dependencies -->
+    <jackson.version>2.12.1</jackson.version>
+    <log4j.version>2.13.3</log4j.version>
+    <zookeeper.version>3.5.7</zookeeper.version>
+    <commons.version>1.4</commons.version>
+    <mockito.version>3.6.0</mockito.version>
+    <junit.version>4.13.1</junit.version>
+    <testcontainers.version>1.15.2</testcontainers.version>
+    <jedis.version>3.2.0</jedis.version>
+    <confluent.version>6.1.0</confluent.version>
+    <confluent-ce.version>6.1.0-ce</confluent-ce.version>
+    <avro.version>1.9.2</avro.version>
+    <jersey.version>2.22.2</jersey.version>
+    <hamcrest.version>2.2</hamcrest.version>
+    <assertj.version>3.15.0</assertj.version>
+    <jinjava.version>2.5.4</jinjava.version>
+    <aws.java.sdk.version>2.16.31</aws.java.sdk.version>
+    <gcp.java.sdk.version>19.2.1</gcp.java.sdk.version>
+    <ksqldb.version>0.17.0</ksqldb.version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
       <plugin>
@@ -40,29 +73,30 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka_2.13</artifactId>
-      <version>2.4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.kafka</groupId>
       <artifactId>connect-api</artifactId>
-      <version>2.4.1</version>
+      <version>${confluent-ce.version}</version>
     </dependency>
     <dependency>
       <groupId>io.confluent</groupId>
       <artifactId>kafka-connect-jdbc</artifactId>
-      <version>5.4.1</version>
+      <version>10.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.debezium</groupId>
+      <artifactId>debezium-core</artifactId>
+      <version>1.6.1.Final</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.10.19</version>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
