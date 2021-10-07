@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 
 public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
 
@@ -53,5 +54,32 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
             }
         }
         return super.maybeBindLogical(statement, index, schema, value);
+    }
+
+    @Override
+    protected Integer getSqlTypeForSchema(Schema schema) {
+        if (schema == null) {
+            return null;
+        }
+
+        switch (schema.type()) {
+            case INT8:
+            case INT16:
+            case INT32:
+                return Types.INTEGER;
+            case INT64:
+                return Types.BIGINT;
+            case FLOAT32:
+            case FLOAT64:
+                return Types.FLOAT;
+            case BOOLEAN:
+                return Types.BOOLEAN;
+            case STRING:
+                return Types.VARCHAR;
+            case BYTES:
+                return Types.VARBINARY;
+            default:
+                return null;
+        }
     }
 }
