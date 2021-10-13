@@ -6,12 +6,12 @@
 
   <groupId>com.purbon.kafka.connect</groupId>
   <artifactId>CustomJdbcDialog</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
 
   <repositories>
     <repository>
       <id>confluent</id>
-      <url>http://packages.confluent.io/maven/</url>
+      <url>https://packages.confluent.io/maven/</url>
     </repository>
   </repositories>
 
