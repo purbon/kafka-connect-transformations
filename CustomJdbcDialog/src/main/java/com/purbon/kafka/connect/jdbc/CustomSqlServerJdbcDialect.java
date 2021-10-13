@@ -3,6 +3,7 @@ package com.purbon.kafka.connect.jdbc;
 import io.confluent.connect.jdbc.dialect.DatabaseDialect;
 import io.confluent.connect.jdbc.dialect.DatabaseDialectProvider;
 import io.confluent.connect.jdbc.dialect.SqlServerDatabaseDialect;
+import io.confluent.connect.jdbc.sink.metadata.SinkRecordField;
 import io.confluent.connect.jdbc.util.DateTimeUtils;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.data.Schema;
@@ -81,5 +82,20 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
             default:
                 return null;
         }
+    }
+
+    @Override
+    protected String getSqlType(SinkRecordField field) {
+        if (field.schemaName() != null) {
+            switch (field.schemaName()) {
+                case DebeziumTimeUnits.MILLIS_TIMESTAMP:
+                    return "datetime";
+                case DebeziumTimeUnits.NANOS_TIMESTAMP:
+                    return "datetime2(7)";
+                default:
+                    // pass
+            }
+        }
+        return super.getSqlType(field);
     }
 }
