@@ -7,11 +7,13 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Timestamp;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 public class TestCustomSqlServerJdbcDialect  extends BaseDialectTest<CustomSqlServerJdbcDialect> {
 
     @Override
     protected CustomSqlServerJdbcDialect createDialect() {
-        return new CustomSqlServerJdbcDialect(sourceConfigWithUrl("jdbc:sqlserver://something"));
+        return new CustomSqlServerJdbcDialect(sourceConfigWithUrl("jdbc:customSqlServer://something"));
     }
 
     @Test
@@ -24,7 +26,10 @@ public class TestCustomSqlServerJdbcDialect  extends BaseDialectTest<CustomSqlSe
 
         var debeziumMillisTimeSchema = SchemaBuilder.int64().name(DebeziumTimeUnits.MILLIS_TIMESTAMP).version(1).build();
         verifyDataTypeMapping("datetime", debeziumMillisTimeSchema);
+    }
 
+    @Override
+    public void bindFieldNull() throws SQLException {
 
     }
 }
