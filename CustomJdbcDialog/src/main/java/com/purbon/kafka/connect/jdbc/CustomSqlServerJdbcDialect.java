@@ -14,6 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
 
@@ -41,8 +44,11 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
             switch (schema.name()) {
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     Timestamp millisTimestamp = Conversions.toTimestampFromMillis((long)value);
-                    log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp);
-                    statement.setTimestamp(index, millisTimestamp, DateTimeUtils.getTimeZoneCalendar(timeZone()));
+                    log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp.toString());
+                    String UTC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+                    DateFormat df = new SimpleDateFormat(UTC_DATE_FORMAT);
+                    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    statement.setString(index, df.format(millisTimestamp));
                     return true;
                 case DebeziumTimeUnits.NANOS_TIMESTAMP:
                     Timestamp nanoTimestamp = Conversions.toTimestampFromNanos((long)value);
