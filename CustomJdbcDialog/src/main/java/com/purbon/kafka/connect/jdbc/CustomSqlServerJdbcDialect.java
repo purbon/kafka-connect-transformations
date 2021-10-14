@@ -23,7 +23,7 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
     private static final Logger log = LoggerFactory.getLogger(CustomSqlServerJdbcDialect.class);
 
     private static final String UTC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-    private static final String TIME_ZONE_LABEL = "GMT";
+    private static final String TIME_ZONE_LABEL = "UTC";
     private DateFormat df;
 
     public CustomSqlServerJdbcDialect(AbstractConfig config) {
