@@ -22,9 +22,14 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
 
     private static final Logger log = LoggerFactory.getLogger(CustomSqlServerJdbcDialect.class);
 
+    private static final String UTC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String TIME_ZONE_LABEL = "GMT";
+    private DateFormat df;
 
     public CustomSqlServerJdbcDialect(AbstractConfig config) {
         super(config);
+        df = new SimpleDateFormat(UTC_DATE_FORMAT);
+        df.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_LABEL));
     }
 
     public static class Provider extends DatabaseDialectProvider.SubprotocolBasedProvider {
@@ -45,9 +50,6 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     Timestamp millisTimestamp = Conversions.toTimestampFromMillis((long)value);
                     log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp.toString());
-                    String UTC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-                    DateFormat df = new SimpleDateFormat(UTC_DATE_FORMAT);
-                    df.setTimeZone(TimeZone.getTimeZone("GMT"));
                     statement.setString(index, df.format(millisTimestamp));
                     return true;
                 case DebeziumTimeUnits.NANOS_TIMESTAMP:
