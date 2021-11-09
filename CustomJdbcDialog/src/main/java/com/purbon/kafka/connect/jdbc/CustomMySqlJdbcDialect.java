@@ -10,12 +10,15 @@ import org.apache.kafka.connect.data.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.stream.Collectors;
 
 public class CustomMySqlJdbcDialect extends MySqlDatabaseDialect {
@@ -42,6 +45,13 @@ public class CustomMySqlJdbcDialect extends MySqlDatabaseDialect {
     protected boolean maybeBindLogical(PreparedStatement statement, int index, Schema schema, Object value) throws SQLException {
         if (schema.name() != null) {
             switch (schema.name()) {
+                case DebeziumTimeUnits.DATE_TIMESTAMP:
+                    Calendar calendar = new GregorianCalendar(1970, Calendar.JANUARY, 1, 0, 0, 0);      
+                    calendar.add(Calendar.DAY_OF_YEAR, (int)value);
+                    Date date = new Date(calendar.getTimeInMillis());
+                    log.debug("TimeConversion[" + DebeziumTimeUnits.DATE_TIMESTAMP + "] value=" + value + " into time="+date.toString());               
+                    statement.setDate(index, date);
+                    return true;
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     Timestamp millisTimestamp = Conversions.toTimestampFromMillis((long)value);
                     log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp);
