@@ -81,6 +81,19 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
             return null;
         }
 
+        if(schema.name() != null){
+            switch(schema.name()){
+                case DebeziumTimeUnits.DATE_TIMESTAMP:
+                    return Types.DATE;
+                case DebeziumTimeUnits.MILLIS_TIMESTAMP:
+                    return Types.NVARCHAR;
+                case DebeziumTimeUnits.NANOS_TIMESTAMP:
+                    return Types.TIMESTAMP;
+                default:
+                    // pass
+            }
+        }
+
         switch (schema.type()) {
             case INT8:
             case INT16:
