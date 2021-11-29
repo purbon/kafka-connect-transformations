@@ -10,12 +10,15 @@ import org.apache.kafka.connect.data.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
@@ -47,6 +50,13 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
     protected boolean maybeBindLogical(PreparedStatement statement, int index, Schema schema, Object value) throws SQLException {
         if (schema.name() != null) {
             switch (schema.name()) {
+                case DebeziumTimeUnits.DATE_TIMESTAMP:
+                    Calendar calendar = new GregorianCalendar(1970, Calendar.JANUARY, 1, 0, 0, 0);      
+                    calendar.add(Calendar.DAY_OF_YEAR, (int)value);
+                    Date date = new Date(calendar.getTimeInMillis());
+                    log.debug("TimeConversion[" + DebeziumTimeUnits.DATE_TIMESTAMP + "] value=" + value + " into time="+date.toString());               
+                    statement.setDate(index, date);
+                    return true;
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     Timestamp millisTimestamp = Conversions.toTimestampFromMillis((long)value);
                     log.debug("TimeConversion[io.debezium.time.Timestamp]: value="+value+" into time="+millisTimestamp.toString());
@@ -69,6 +79,19 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
     protected Integer getSqlTypeForSchema(Schema schema) {
         if (schema == null) {
             return null;
+        }
+
+        if(schema.name() != null){
+            switch(schema.name()){
+                case DebeziumTimeUnits.DATE_TIMESTAMP:
+                    return Types.DATE;
+                case DebeziumTimeUnits.MILLIS_TIMESTAMP:
+                    return Types.NVARCHAR;
+                case DebeziumTimeUnits.NANOS_TIMESTAMP:
+                    return Types.TIMESTAMP;
+                default:
+                    // pass
+            }
         }
 
         switch (schema.type()) {
@@ -96,6 +119,8 @@ public class CustomSqlServerJdbcDialect extends SqlServerDatabaseDialect {
     protected String getSqlType(SinkRecordField field) {
         if (field.schemaName() != null) {
             switch (field.schemaName()) {
+                case DebeziumTimeUnits.DATE_TIMESTAMP:
+                    return "date";
                 case DebeziumTimeUnits.MILLIS_TIMESTAMP:
                     return "datetime";
                 case DebeziumTimeUnits.NANOS_TIMESTAMP:
